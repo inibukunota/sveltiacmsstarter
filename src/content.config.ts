@@ -3,7 +3,7 @@ import { defineCollection } from "astro:content";
 import { z } from "astro/zod";
 
 const blog = defineCollection({
-	// Load Markdown and MDX files in the `src/content/blog/` directory.
+	// Load Markdown and MDX files in the src/content/blog/ directory.
 	loader: glob({ base: "./src/content/blog", pattern: "**/*.{md,mdx}" }),
 	// Type-check frontmatter using a schema
 	schema: z.object({
@@ -11,7 +11,12 @@ const blog = defineCollection({
 		description: z.string(),
 		// Transform string to Date object
 		pubDate: z.coerce.date(),
-		updatedDate: z.coerce.date().optional(),
+		// Sveltia can save an optional datetime field as an empty string.
+		// Treat an empty value as missing instead of an invalid date.
+		updatedDate: z.preprocess(
+			(value) => (value === "" ? undefined : value),
+			z.coerce.date().optional(),
+		),
 		heroImage: z.string().optional(),
 	}),
 });
