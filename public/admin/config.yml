@@ -1,0 +1,41 @@
+# yaml-language-server: $schema=https://unpkg.com/@sveltia/cms/schema/sveltia-cms.json
+
+backend:
+  name: github
+  repo: inibukunota/sveltiacmsstarter
+  branch: main
+  auth_methods:
+    - token
+
+media_folder: /public/uploads
+public_folder: /uploads
+
+collections:
+  - name: blog
+    label: Blog
+    label_singular: Post
+    folder: /src/content/blog
+    create: true
+    fields:
+      - label: Title
+        name: title
+        widget: string
+      - label: Description
+        name: description
+        widget: text
+      - label: Publish Date
+        name: pubDate
+        widget: datetime
+        type: date
+      - label: Updated Date
+        name: updatedDate
+        widget: datetime
+        type: date
+        required: false
+      - label: Hero Image
+        name: heroImage
+        widget: image
+        required: false
+      - label: Body
+        name: body
+        widget: richtext
