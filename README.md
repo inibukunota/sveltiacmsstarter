@@ -1,64 +1,118 @@
-# Astro Starter Kit: Blog.1
+# Astro + Sveltia CMS Starter
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/templates/tree/main/astro-blog-starter-template)
+A reusable static blog starter built with **Astro**, **Sveltia CMS**, **GitHub**, **Cloudflare Pages**, and **Cloudflare R2**.
 
-![Astro Template Preview](https://github.com/withastro/astro/assets/2244813/ff10799f-a816-4703-b967-c78997e8323d)
+## Stack
 
-<!-- dash-content-start -->
+- **Astro** for the website and static builds
+- **Sveltia CMS** for content management
+- **GitHub** for content and source control
+- **Cloudflare Pages** for deployment
+- **Cloudflare R2** for CMS media storage
+- **WebP image optimization** before images reach R2
 
-Create a blog with Astro and deploy it on Cloudflare Workers as a [static website](https://developers.cloudflare.com/workers/static-assets/).
+## How It Works
 
-Features:
-
-- ✅ Minimal styling (make it your own!)
-- ✅ 100/100 Lighthouse performance
-- ✅ SEO-friendly with canonical URLs and OpenGraph data
-- ✅ Sitemap support
-- ✅ RSS Feed support
-- ✅ Markdown & MDX support
-- ✅ Built-in Observability logging
-
-<!-- dash-content-end -->
-
-## Getting Started
-
-Outside of this repo, you can start a new project with this template using [C3](https://developers.cloudflare.com/pages/get-started/c3/) (the `create-cloudflare` CLI):
-
-```bash
-npm create cloudflare@latest -- --template=cloudflare/templates/astro-blog-starter-template
+```
+Sveltia CMS
+    ↓
+GitHub → Astro → Cloudflare Pages
+    ↓
+Cloudflare R2
 ```
 
-A live public deployment of this template is available at [https://astro-blog-starter-template.templates.workers.dev](https://astro-blog-starter-template.templates.workers.dev)
+Blog content is saved as Markdown files in `src/content/blog/`. Sveltia commits changes directly to the GitHub repository, which triggers a Cloudflare Pages build.
 
-## 🚀 Project Structure
+Images uploaded through Sveltia are optimized in the browser before being uploaded to R2. Raster images such as JPEG and PNG are converted to WebP, resized to a maximum width of 1200px, and compressed at quality 75. EXIF metadata is also removed. This keeps the stored files smaller without needing a separate image-processing Worker.
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## CMS
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+Open:
 
-The `src/content/` directory contains "collections" of related Markdown and MDX documents. Use `getCollection()` to retrieve posts from `src/content/blog/`, and type-check your frontmatter using an optional schema. See [Astro's Content Collections docs](https://docs.astro.build/en/guides/content-collections/) to learn more.
+`/admin/`
 
-Any static assets, like images, can be placed in the `public/` directory.
+The Sveltia configuration is located at:
 
-## 🧞 Commands
+`public/admin/config.yml`
 
-All commands are run from the root of the project, from a terminal:
+The blog collection supports:
 
-| Command                           | Action                                           |
-| :-------------------------------- | :----------------------------------------------- |
-| `npm install`                     | Installs dependencies                            |
-| `npm run dev`                     | Starts local dev server at `localhost:4321`      |
-| `npm run build`                   | Build your production site to `./dist/`          |
-| `npm run preview`                 | Preview your build locally, before deploying     |
-| `npm run astro ...`               | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help`         | Get help using the Astro CLI                     |
-| `npm run build && npm run deploy` | Deploy your production site to Cloudflare        |
-| `npm wrangler tail`               | View real-time logs for all Workers              |
+- Title
+- Description
+- Publish date
+- Updated date
+- Hero image
+- Rich-text body
 
-## 👀 Want to learn more?
+Images are stored in the `sveltiacms` R2 bucket under the `cms-uploads/` prefix.
 
-Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+The R2 secret access key is entered in Sveltia and is **not stored in this repository**.
 
-## Credit
+## Project Structure
 
-This theme is based off of the lovely [Bear Blog](https://github.com/HermanMartinus/bearblog/).
+```
+public/
+└── admin/
+    ├── index.html
+    └── config.yml
+
+src/
+├── content/
+│   └── blog/
+└── pages/
+
+astro.config.mjs
+package.json
+```
+
+## Local Development
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+Build the production site:
+
+```bash
+npm run build
+```
+
+The production output is generated in `dist/`.
+
+## Cloudflare Pages
+
+Production deployment uses the `main` branch.
+
+Build command:
+
+```
+npm run build
+```
+
+Output directory:
+
+```
+dist
+```
+
+Set `PUBLIC_SITE_URL` in the Cloudflare Pages environment variables when using a custom domain.
+
+## Reusing This Starter
+
+Fork or copy this repository, then update:
+
+1. The GitHub repository in `public/admin/config.yml`
+2. The Sveltia CMS GitHub authentication
+3. The Cloudflare R2 bucket and credentials
+4. The Cloudflare Pages project
+5. `PUBLIC_SITE_URL` for the new site
+
+The goal is to provide a simple, repeatable foundation for launching Astro content sites without rebuilding the CMS and deployment setup from scratch.
